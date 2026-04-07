@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6272e237e4c517953bcda164956743d0, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  InitialForwardSpeed: 10
+  MaxForwardSpeed: 30
+  SpeedIncreaseRate: 0.1
+  LaneDistance: 3
+  LaneSwitchSpeed: 10
+  JumpForce: 10
+  Gravity: -30
+  SlideDuration: 0.6
+  FruitRotationSpeed: 180
+  ChunksAhead: 5
+  ChunksBehind: 2
+  ChunkLength: 30
+  MinObstacleSpacing: 15
+  MaxObstacleSpacing: 30
+  DifficultyIncreaseRate: 0.02
+  MaxDifficultyMultiplier: 3
+  CoinSpacing: 2
+  MinCoinsPerPattern: 3
+  MaxCoinsPerPattern: 8
+  ScreenShakeIntensity: 0.15
+  ScreenShakeDuration: 0.2
+  NearMissDistance: 1.5
+  SwipeThreshold: 50
