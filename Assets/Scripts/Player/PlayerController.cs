@@ -1,5 +1,6 @@
 using UnityEngine;
 using SkibidiBrainrotFruit.Core;
+using SkibidiBrainrotFruit.GameManagement;
 
 namespace SkibidiBrainrotFruit.Player
 {
@@ -176,7 +177,10 @@ namespace SkibidiBrainrotFruit.Player
 
             if (hit.gameObject.CompareTag("Obstacle"))
             {
-                GameEvents.TriggerGameOver();
+                if (GameManager.Instance != null)
+                    GameManager.Instance.GameOver();
+                else
+                    GameEvents.TriggerGameOver();
             }
         }
     }

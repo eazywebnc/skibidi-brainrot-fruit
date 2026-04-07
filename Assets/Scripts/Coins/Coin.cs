@@ -42,6 +42,8 @@ namespace SkibidiBrainrotFruit.Coins
                 Instantiate(_collectEffect, transform.position, Quaternion.identity);
             }
 
+            // Disable collider immediately to prevent double-collection
+            GetComponent<Collider>().enabled = false;
             Destroy(gameObject);
         }
     }

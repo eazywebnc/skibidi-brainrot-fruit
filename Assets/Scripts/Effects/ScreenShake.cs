@@ -8,6 +8,8 @@ namespace SkibidiBrainrotFruit.Effects
         [SerializeField] private GameConfig _config;
 
         private float _shakeTimer;
+        private float _shakeDuration;
+        private float _shakeIntensity;
         private Vector3 _originalPosition;
         private bool _isShaking;
 
@@ -39,6 +41,8 @@ namespace SkibidiBrainrotFruit.Effects
             {
                 _originalPosition = transform.localPosition;
             }
+            _shakeIntensity = intensity;
+            _shakeDuration = duration;
             _shakeTimer = duration;
             _isShaking = true;
         }
@@ -56,8 +60,8 @@ namespace SkibidiBrainrotFruit.Effects
                 return;
             }
 
-            float intensity = _config.ScreenShakeIntensity * (_shakeTimer / _config.ScreenShakeDuration);
-            transform.localPosition = _originalPosition + Random.insideUnitSphere * intensity;
+            float currentIntensity = _shakeIntensity * (_shakeTimer / _shakeDuration);
+            transform.localPosition = _originalPosition + Random.insideUnitSphere * currentIntensity;
         }
     }
 }

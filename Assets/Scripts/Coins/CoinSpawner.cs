@@ -75,7 +75,7 @@ namespace SkibidiBrainrotFruit.Coins
                         break;
                     case CoinPattern.Arc:
                         x = lane * _config.LaneDistance;
-                        float t = (float)i / (count - 1);
+                        float t = count > 1 ? (float)i / (count - 1) : 0f;
                         y = 1.5f + Mathf.Sin(t * Mathf.PI) * 2f;
                         break;
                     case CoinPattern.Zigzag:
