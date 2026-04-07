@@ -1,0 +1,169 @@
+# GameCI Unity Build Pipeline — Skibidi Brainrot Fruit
+# Builds WebGL + Android targets using GameCI actions.
+# Requires repository secrets:
+#   UNITY_LICENSE  — Unity .ulf license file content (base64)
+#   UNITY_EMAIL    — Unity account email
+#   UNITY_PASSWORD — Unity account password
+
+name: Unity Build
+
+on:
+  push:
+    branches: [master, main, develop]
+  pull_request:
+    branches: [master, main]
+  workflow_dispatch:
+    inputs:
+      run_batch_setup:
+        description: "Run BatchSetup before build"
+        required: false
+        default: "true"
+        type: choice
+        options: ["true", "false"]
+
+env:
+  UNITY_VERSION: 2022.3.20f1
+  PROJECT_PATH: .
+
+jobs:
+  # ── Step 1: Run BatchSetup in batch mode ──────────────────────────────
+  setup:
+    name: "Setup: Generate Assets & Scenes"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-setup-${{ hashFiles('Assets/**', 'Packages/manifest.json', 'ProjectSettings/**') }}
+          restore-keys: Library-setup-
+
+      - uses: game-ci/unity-builder@v4
+        id: batchSetup
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          projectPath: ${{ env.PROJECT_PATH }}
+          targetPlatform: WebGL
+          buildMethod: SkibidiBrainrotFruit.Editor.BatchSetup.Run
+          # buildMethod runs the setup; we skip actual build here
+          allowDirtyBuild: true
+
+      # Upload the Library + generated assets for downstream jobs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unity-project-setup
+          path: |
+            Assets/
+            ProjectSettings/
+            Library/
+          retention-days: 1
+
+  # ── Step 2: Build WebGL ───────────────────────────────────────────────
+  build-webgl:
+    name: "Build: WebGL"
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: unity-project-setup
+
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-webgl-${{ hashFiles('Assets/**', 'Packages/manifest.json') }}
+          restore-keys: |
+            Library-webgl-
+            Library-setup-
+
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          projectPath: ${{ env.PROJECT_PATH }}
+          targetPlatform: WebGL
+          buildName: SkibidiBrainrotFruit
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-WebGL
+          path: build/WebGL
+          retention-days: 14
+
+  # ── Step 3: Build Android ─────────────────────────────────────────────
+  build-android:
+    name: "Build: Android"
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: unity-project-setup
+
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-android-${{ hashFiles('Assets/**', 'Packages/manifest.json') }}
+          restore-keys: |
+            Library-android-
+            Library-setup-
+
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          projectPath: ${{ env.PROJECT_PATH }}
+          targetPlatform: Android
+          buildName: SkibidiBrainrotFruit
+          androidAppBundle: true
+          androidKeystoreName: ""
+          androidKeystoreBase64: ""
+          androidKeystorePass: ""
+          androidKeyaliasName: ""
+          androidKeyaliasPass: ""
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-Android
+          path: build/Android
+          retention-days: 14
+
+  # ── Step 4: Compile validation ────────────────────────────────────────
+  validate:
+    name: "Validate: Script Compilation"
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: unity-project-setup
+
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          projectPath: ${{ env.PROJECT_PATH }}
+          targetPlatform: WebGL
+          # compile-only: no build output, just verify all scripts resolve
+          buildMethod: ""
+          allowDirtyBuild: true

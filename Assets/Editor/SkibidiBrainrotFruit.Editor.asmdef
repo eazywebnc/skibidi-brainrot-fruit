@@ -1,0 +1,21 @@
+{
+    "name": "SkibidiBrainrotFruit.Editor",
+    "rootNamespace": "SkibidiBrainrotFruit.Editor",
+    "references": [
+        "SkibidiBrainrotFruit",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Universal.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
